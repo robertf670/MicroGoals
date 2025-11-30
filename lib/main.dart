@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'core/routes/app_router.dart';
+import 'core/services/purchase_service.dart';
 import 'presentation/providers/theme_provider.dart';
 import 'presentation/providers/premium_provider.dart';
 
@@ -11,6 +12,9 @@ void main() async {
   
   // Initialize SharedPreferences
   final prefs = await SharedPreferences.getInstance();
+  
+  // Initialize Purchase Service
+  await PurchaseService.instance.initialize();
   
   runApp(ProviderScope(
     overrides: [

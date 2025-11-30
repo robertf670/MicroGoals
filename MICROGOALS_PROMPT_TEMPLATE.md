@@ -26,7 +26,7 @@ MicroGoals helps users stay focused on meaningful objectives rather than endless
 
 ### Premium Features (€2.99/year or €4.99 lifetime)
 
-- Up to **5 active goals**
+- Up to **30 active goals**
 - Custom icons and colors
 - Progress history chart
 - Export to CSV/JSON
