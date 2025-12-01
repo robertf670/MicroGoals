@@ -51,3 +51,9 @@ final milestonesProvider = FutureProvider.family<List<Map<String, dynamic>>, int
   if (!isPremium) return [];
   return await repository.getMilestones(goalId);
 });
+
+// Single goal provider by ID
+final goalByIdProvider = FutureProvider.family<Goal?, int>((ref, goalId) async {
+  final repository = ref.watch(goalRepositoryProvider);
+  return await repository.getGoalById(goalId);
+});

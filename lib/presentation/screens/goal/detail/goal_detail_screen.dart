@@ -58,6 +58,7 @@ class _GoalDetailScreenState extends ConsumerState<GoalDetailScreen> {
         ref.invalidate(goalsProvider);
         ref.invalidate(allGoalsProvider);
         ref.invalidate(activeGoalCountProvider);
+        ref.invalidate(goalByIdProvider(widget.goalId));
         
         if (mounted) {
           context.pop(); // Return to previous screen
@@ -90,6 +91,7 @@ class _GoalDetailScreenState extends ConsumerState<GoalDetailScreen> {
       ref.invalidate(goalsProvider);
       ref.invalidate(allGoalsProvider);
       ref.invalidate(activeGoalCountProvider);
+      ref.invalidate(goalByIdProvider(goal.id!));
       if (isPremium) {
         ref.invalidate(progressHistoryProvider(goal.id!));
         ref.invalidate(milestonesProvider(goal.id!));
@@ -148,7 +150,7 @@ class _GoalDetailScreenState extends ConsumerState<GoalDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final allGoalsAsync = ref.watch(allGoalsProvider);
+    final goalAsync = ref.watch(goalByIdProvider(widget.goalId));
 
     return Scaffold(
       appBar: AppBar(
@@ -166,22 +168,62 @@ class _GoalDetailScreenState extends ConsumerState<GoalDetailScreen> {
       ),
       body: Stack(
         children: [
-          allGoalsAsync.when(
-            data: (goals) {
-              final goal = goals.firstWhere(
-                (g) => g.id == widget.goalId,
-                orElse: () => throw Exception('Goal not found'),
-              );
+          goalAsync.when(
+            data: (goal) {
+              if (goal == null) {
+                return Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Icon(Icons.error_outline, size: 64, color: Colors.grey),
+                      const SizedBox(height: 16),
+                      Text(
+                        'Goal not found',
+                        style: Theme.of(context).textTheme.titleLarge,
+                      ),
+                      const SizedBox(height: 8),
+                      TextButton(
+                        onPressed: () => context.pop(),
+                        child: const Text('Go Back'),
+                      ),
+                    ],
+                  ),
+                );
+              }
               return _buildContent(goal);
             },
             loading: () => const Center(child: CircularProgressIndicator()),
             error: (error, stack) {
-               // If goal was just deleted, we might get an error here before navigation completes
-               // Return a loading indicator or empty container to avoid UI flash
-               if (error.toString().contains('Goal not found')) {
-                 return const Center(child: CircularProgressIndicator());
-               }
-               return Center(child: Text('Error: $error'));
+              Logger.error('Failed to load goal', error, stack);
+              return Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Icon(Icons.error_outline, size: 64, color: Colors.grey),
+                    const SizedBox(height: 16),
+                    Text(
+                      'Error loading goal',
+                      style: Theme.of(context).textTheme.titleLarge,
+                    ),
+                    const SizedBox(height: 8),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 32),
+                      child: Text(
+                        error.toString(),
+                        textAlign: TextAlign.center,
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          color: Colors.grey[600],
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    TextButton(
+                      onPressed: () => context.pop(),
+                      child: const Text('Go Back'),
+                    ),
+                  ],
+                ),
+              );
             },
           ),
           if (_showCelebration)

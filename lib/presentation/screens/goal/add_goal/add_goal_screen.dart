@@ -54,11 +54,13 @@ class _AddGoalScreenState extends ConsumerState<AddGoalScreen> {
         colorHex: _selectedColorHex,
       );
 
-      await ref.read(goalRepositoryProvider).createGoal(goal);
+      final goalId = await ref.read(goalRepositoryProvider).createGoal(goal);
       
       // Invalidate providers to refresh list
       ref.invalidate(goalsProvider);
+      ref.invalidate(allGoalsProvider);
       ref.invalidate(activeGoalCountProvider);
+      ref.invalidate(goalByIdProvider(goalId));
       
       if (mounted) {
         context.pop();

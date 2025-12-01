@@ -38,6 +38,27 @@ class GoalRepository {
     }
   }
 
+  Future<Goal?> getGoalById(int goalId) async {
+    try {
+      final db = await _database.database;
+      final maps = await db.query(
+        'goals',
+        where: 'id = ?',
+        whereArgs: [goalId],
+        limit: 1,
+      );
+
+      if (maps.isEmpty) {
+        return null;
+      }
+
+      return Goal.fromMap(maps.first);
+    } catch (e, stackTrace) {
+      Logger.error('Failed to get goal by id', e, stackTrace);
+      throw RepositoryException('Failed to load goal: ${e.toString()}', e);
+    }
+  }
+
   Future<int> createGoal(Goal goal) async {
     try {
       final db = await _database.database;

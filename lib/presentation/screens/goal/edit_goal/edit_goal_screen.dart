@@ -108,6 +108,7 @@ class _EditGoalScreenState extends ConsumerState<EditGoalScreen> {
       // Invalidate providers
       ref.invalidate(goalsProvider);
       ref.invalidate(allGoalsProvider);
+      ref.invalidate(goalByIdProvider(widget.goalId));
       
       if (mounted) {
         context.pop();
